@@ -89,5 +89,7 @@ public class AuthorServiceImpl implements AuthorService {
         } else throw new RuntimeException("author not found");
     }
 
-
+    public void deleteAuthor(Long authorId) {
+        authorRepository.deleteById(authorId);
+    };
 }

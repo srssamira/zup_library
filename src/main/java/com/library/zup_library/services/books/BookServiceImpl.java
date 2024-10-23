@@ -82,5 +82,7 @@ public class BookServiceImpl implements BookService {
         } else throw new RuntimeException("book not found");
     }
 
-
+    public void deleteBook(Long bookId) {
+        bookRepository.deleteById(bookId);
+    }
 }

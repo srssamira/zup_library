@@ -32,4 +32,10 @@ public class AuthorController {
     public Author updateAuthor(@PathVariable Long authorId, @RequestBody @Valid AuthorUpdateDTO authorUpdateDTO) {
         return authorService.updateAuthor(authorUpdateDTO, authorId);
     }
+
+    @DeleteMapping("/{authorId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAuthor(@PathVariable Long authorId) {
+        authorService.deleteAuthor(authorId);
+    }
 }
