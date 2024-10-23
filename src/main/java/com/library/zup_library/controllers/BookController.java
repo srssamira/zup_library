@@ -1,7 +1,10 @@
 package com.library.zup_library.controllers;
 
+import com.library.zup_library.controllers.dtos.authors.AuthorUpdateDTO;
 import com.library.zup_library.controllers.dtos.books.BookRegisterDTO;
 import com.library.zup_library.controllers.dtos.books.BookResponseDTO;
+import com.library.zup_library.controllers.dtos.books.BookUpdateDTO;
+import com.library.zup_library.models.Author;
 import com.library.zup_library.models.Book;
 import com.library.zup_library.services.books.BookService;
 import jakarta.validation.Valid;
@@ -25,5 +28,10 @@ public class BookController {
     @GetMapping("/{bookId}")
     public BookResponseDTO getBookById(@PathVariable long bookId) {
         return bookService.findBookById(bookId);
+    }
+
+    @PutMapping("/{bookId}")
+    public Book updateAuthor(@PathVariable Long bookId, @RequestBody @Valid BookUpdateDTO bookUpdateDTO) {
+        return bookService.updateBook(bookUpdateDTO, bookId);
     }
 }

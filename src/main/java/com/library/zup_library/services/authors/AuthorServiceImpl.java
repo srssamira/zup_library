@@ -2,6 +2,7 @@ package com.library.zup_library.services.authors;
 
 import com.library.zup_library.controllers.dtos.authors.AuthorRegisterDTO;
 import com.library.zup_library.controllers.dtos.authors.AuthorResponseDTO;
+import com.library.zup_library.controllers.dtos.authors.AuthorUpdateDTO;
 import com.library.zup_library.models.Author;
 import com.library.zup_library.models.Book;
 import com.library.zup_library.repositories.AuthorRepository;
@@ -36,4 +37,57 @@ public class AuthorServiceImpl implements AuthorService {
         Author author = authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException("book not found (ID " + authorId + ")"));
         return AuthorMapper.toAuthorResponseDTO(author);
     }
+
+    private Author searchAuthor(Long authorId) {
+        Optional<Author> author = authorRepository.findById(authorId);
+        return author.orElseThrow(() -> new RuntimeException("book not found (ID " + authorId + ")"));
+    }
+
+    public Author updateAuthor(AuthorUpdateDTO authorToUpdate, Long id) {
+
+        if (authorRepository.existsById(id)) {
+            Author author = searchAuthor(authorToUpdate.getId());
+
+            if (!author.getName().equals(authorToUpdate.getName())) {
+                author.setName(authorToUpdate.getName());
+            }
+
+            if (!author.getLastName().equals(authorToUpdate.getLastName())) {
+                author.setLastName(authorToUpdate.getLastName());
+            }
+
+            if (author.getYearOfBirth() != authorToUpdate.getYearOfBirth()) {
+                author.setYearOfBirth(authorToUpdate.getYearOfBirth());
+            }
+
+            if (author.getYearOfDeath() != authorToUpdate.getYearOfDeath()) {
+                author.setYearOfDeath(authorToUpdate.getYearOfDeath());
+            }
+
+            List<Long> booksId = author.getBooks().stream().map(book -> book.getId()).collect(Collectors.toList());
+            List<Long> booksIdUpdate = authorToUpdate.getBooks();
+
+            if (booksId.size() != booksIdUpdate.size()) {
+                List<Book> books = booksIdUpdate.stream()
+                        .map(bookId -> bookRepository.findById(bookId)
+                                .orElseThrow(() -> new RuntimeException("book not found")))
+                        .collect(Collectors.toList());
+                author.setBooks(books);
+
+            } else {
+                for (int index = 0; index < booksId.size(); index++) {
+                    Book book = bookRepository.findById(booksId.get(index)).get();
+                    Book bookToUpdate = bookRepository.findById(booksIdUpdate.get(index)).get();
+
+                    if (!book.getId().equals(bookToUpdate.getId())) {
+                        booksId.set(index, bookToUpdate.getId());
+                    }
+                }
+            }
+
+            return authorRepository.save(author);
+        } else throw new RuntimeException("author not found");
+    }
+
+
 }
