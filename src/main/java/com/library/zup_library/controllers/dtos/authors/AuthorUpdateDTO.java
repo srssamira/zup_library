@@ -1,6 +1,5 @@
 package com.library.zup_library.controllers.dtos.authors;
 
-import com.library.zup_library.controllers.dtos.books.BookResponseDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

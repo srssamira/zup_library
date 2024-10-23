@@ -1,10 +1,8 @@
 package com.library.zup_library.controllers;
 
-import com.library.zup_library.controllers.dtos.authors.AuthorUpdateDTO;
 import com.library.zup_library.controllers.dtos.books.BookRegisterDTO;
 import com.library.zup_library.controllers.dtos.books.BookResponseDTO;
 import com.library.zup_library.controllers.dtos.books.BookUpdateDTO;
-import com.library.zup_library.models.Author;
 import com.library.zup_library.models.Book;
 import com.library.zup_library.services.books.BookService;
 import jakarta.validation.Valid;

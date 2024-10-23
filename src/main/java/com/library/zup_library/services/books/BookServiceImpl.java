@@ -11,7 +11,6 @@ import com.library.zup_library.services.mappers.BookMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,64 +24,54 @@ public class BookServiceImpl implements BookService {
     @Autowired
     private AuthorRepository authorRepository;
 
+    @Override
     public Book saveBook(BookRegisterDTO bookRegisterDTO) {
-        List<Author> authors = bookRegisterDTO.getAuthorsId().stream()
-                .map(authorId -> authorRepository.findById(authorId)
-                        .orElseThrow(() -> new RuntimeException("author not found (ID " + authorId + ")")))
-                .collect(Collectors.toList());
-
+        List<Author> authors = findAuthorsByIds(bookRegisterDTO.getAuthorsId());
         return bookRepository.save(BookMapper.toBook(bookRegisterDTO, authors));
     }
 
+    @Override
     public BookResponseDTO findBookById(Long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("book not found (ID " + bookId + ")"));
+        Book book = searchBook(bookId);
         return BookMapper.toBookResponseDTO(book);
     }
 
-    private Book searchBook(Long bookId) {
-        Optional<Book> book = bookRepository.findById(bookId);
-        return book.orElseThrow(() -> new RuntimeException("book not found (ID " + bookId + ")"));
-    }
-
+    @Override
     public Book updateBook(BookUpdateDTO bookToUpdate, Long id) {
-
-        if (bookRepository.existsById(id)) {
-            Book book = searchBook(bookToUpdate.getId());
-
-            if (!book.getTitle().equals(bookToUpdate.getTitle())) {
-                book.setTitle(bookToUpdate.getTitle());
-            }
-
-            if (!book.getDescription().equals(bookToUpdate.getDescription())) {
-                book.setDescription(bookToUpdate.getDescription());
-            }
-
-            List<Long> authorsId = book.getAuthors().stream().map(author -> author.getId()).collect(Collectors.toList());
-            List<Long> authorsToUpdate = bookToUpdate.getAuthors();
-
-            if (authorsId.size() != authorsToUpdate.size()) {
-                List<Author> updatedAuthors = authorsToUpdate.stream()
-                        .map(authorId -> authorRepository.findById(authorId)
-                                .orElseThrow(() -> new RuntimeException("author not found")))
-                        .collect(Collectors.toList());
-                book.setAuthors(updatedAuthors);
-
-            } else {
-                for (int index = 0; index < authorsId.size(); index++) {
-                    Author author = authorRepository.findById(authorsId.get(index)).get();
-                    Author authorUpdated = authorRepository.findById(authorsToUpdate.get(index)).get();
-
-                    if (!author.getId().equals(authorUpdated.getId())) {
-                        authorsId.set(index, authorUpdated.getId());
-                    }
-                }
-            }
-
-            return bookRepository.save(book);
-        } else throw new RuntimeException("book not found");
+        Book book = searchBook(id);
+        updateBookFields(book, bookToUpdate);
+        List<Author> updatedAuthors = findAuthorsByIds(bookToUpdate.getAuthors());
+        book.setAuthors(updatedAuthors);
+        return bookRepository.save(book);
     }
 
+    @Override
     public void deleteBook(Long bookId) {
+        if (!bookRepository.existsById(bookId)) {
+            throw new RuntimeException("book not found");
+        }
         bookRepository.deleteById(bookId);
+    }
+
+    private Book searchBook(Long bookId) {
+        return bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("book not found"));
+    }
+
+    private List<Author> findAuthorsByIds(List<Long> authorsId) {
+        return Optional.ofNullable(authorsId).orElse(List.of())
+                .stream()
+                .map(authorId -> authorRepository.findById(authorId)
+                        .orElseThrow(() -> new RuntimeException("author not found")))
+                .collect(Collectors.toList());
+    }
+
+    private void updateBookFields(Book book, BookUpdateDTO bookToUpdate) {
+        if (!book.getTitle().equals(bookToUpdate.getTitle())) {
+            book.setTitle(bookToUpdate.getTitle());
+        }
+        if (!book.getDescription().equals(bookToUpdate.getDescription())) {
+            book.setDescription(bookToUpdate.getDescription());
+        }
     }
 }
