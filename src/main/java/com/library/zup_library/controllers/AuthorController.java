@@ -1,6 +1,7 @@
 package com.library.zup_library.controllers;
 
 import com.library.zup_library.controllers.dtos.authors.AuthorRegisterDTO;
+import com.library.zup_library.controllers.dtos.authors.AuthorResponseDTO;
 import com.library.zup_library.models.Author;
 import com.library.zup_library.services.authors.AuthorService;
 import jakarta.validation.Valid;
@@ -19,5 +20,10 @@ public class AuthorController {
     @ResponseStatus(HttpStatus.CREATED)
     public Author createAuthor(@RequestBody @Valid AuthorRegisterDTO authorRegisterDTO) {
         return authorService.saveAuthor(authorRegisterDTO);
+    }
+
+    @GetMapping("{authorId}")
+    public AuthorResponseDTO getAuthorById(@PathVariable Long authorId) {
+        return authorService.findAuthorById(authorId);
     }
 }

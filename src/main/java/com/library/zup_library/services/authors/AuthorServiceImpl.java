@@ -1,6 +1,7 @@
 package com.library.zup_library.services.authors;
 
 import com.library.zup_library.controllers.dtos.authors.AuthorRegisterDTO;
+import com.library.zup_library.controllers.dtos.authors.AuthorResponseDTO;
 import com.library.zup_library.models.Author;
 import com.library.zup_library.models.Book;
 import com.library.zup_library.repositories.AuthorRepository;
@@ -29,5 +30,10 @@ public class AuthorServiceImpl implements AuthorService {
                 .stream().map(booksId -> bookRepository.findById(booksId).get())
                 .collect(Collectors.toList());
         return authorRepository.save(AuthorMapper.toAuthor(authorRegisterDTO, books));
+    }
+
+    public AuthorResponseDTO findAuthorById(Long authorId) {
+        Author author = authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException("book not found (ID " + authorId + ")"));
+        return AuthorMapper.toAuthorResponseDTO(author);
     }
 }

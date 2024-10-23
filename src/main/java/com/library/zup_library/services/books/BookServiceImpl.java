@@ -1,6 +1,7 @@
 package com.library.zup_library.services.books;
 
 import com.library.zup_library.controllers.dtos.books.BookRegisterDTO;
+import com.library.zup_library.controllers.dtos.books.BookResponseDTO;
 import com.library.zup_library.models.Author;
 import com.library.zup_library.models.Book;
 import com.library.zup_library.repositories.AuthorRepository;
@@ -28,5 +29,10 @@ public class BookServiceImpl implements BookService {
                 .collect(Collectors.toList());
 
         return bookRepository.save(BookMapper.toBook(bookRegisterDTO, authors));
+    }
+
+    public BookResponseDTO findBookById(Long bookId) {
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("book not found (ID " + bookId + ")"));
+        return BookMapper.toBookResponseDTO(book);
     }
 }

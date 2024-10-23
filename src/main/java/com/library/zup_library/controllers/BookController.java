@@ -1,6 +1,7 @@
 package com.library.zup_library.controllers;
 
 import com.library.zup_library.controllers.dtos.books.BookRegisterDTO;
+import com.library.zup_library.controllers.dtos.books.BookResponseDTO;
 import com.library.zup_library.models.Book;
 import com.library.zup_library.services.books.BookService;
 import jakarta.validation.Valid;
@@ -19,5 +20,10 @@ public class BookController {
     @ResponseStatus(HttpStatus.CREATED)
     public Book createBook(@RequestBody @Valid BookRegisterDTO bookRegisterDTO) {
         return bookService.saveBook(bookRegisterDTO);
+    }
+
+    @GetMapping("/{bookId}")
+    public BookResponseDTO getBookById(@PathVariable long bookId) {
+        return bookService.findBookById(bookId);
     }
 }
