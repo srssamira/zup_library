@@ -47,7 +47,7 @@ public class JwtTokenProvider {
     }
 
     // validar token
-    private boolean validateToken(String token) {
+    public boolean validateToken(String token) {
         Jwts.parser()
                 .verifyWith((SecretKeySpec) key())
                 .build()
