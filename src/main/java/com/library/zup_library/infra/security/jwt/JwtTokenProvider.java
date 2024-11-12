@@ -1,7 +1,15 @@
 package com.library.zup_library.infra.security.jwt;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
+import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
@@ -9,6 +17,41 @@ public class JwtTokenProvider {
     private long jwtExpirationDateTime = 3600000;
 
     public String generateToken(Authentication authentication) {
+        String nickname = authentication.getName();
+        Date currentDate = new Date();
+        Date expirationDate = new Date(currentDate.getTime() + jwtExpirationDateTime);
 
+        String token = Jwts.builder()
+                .subject(nickname)
+                .issuedAt(new Date())
+                .expiration(expirationDate)
+                .signWith(SignatureAlgorithm.HS256, key())
+                .compact();
+
+        return token;
+    }
+
+    // método pra criptografar a chave secreta
+    private Key key() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+    }
+
+    // método pra pegar o nickname pelo token
+    public String getNickname(String token) {
+        return Jwts.parser()
+                .verifyWith((SecretKeySpec) key())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
+
+    // validar token
+    private boolean validateToken(String token) {
+        Jwts.parser()
+                .verifyWith((SecretKeySpec) key())
+                .build()
+                .parse(token);
+        return true;
     }
 }
