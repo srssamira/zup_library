@@ -1,9 +1,6 @@
 package com.library.zup_library.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.UUID;
@@ -14,8 +11,8 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @Column(columnDefinition = "UUID", unique = true, nullable = false)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String nickname;
@@ -27,7 +24,4 @@ public class User {
     private String email;
     private String name;
 
-    public User() {
-        this.id = UUID.randomUUID().toString();
-    }
 }
